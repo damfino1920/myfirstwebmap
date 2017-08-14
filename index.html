@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+  <head>
+    <title>My first Leaflet map</title>  
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="main.css"/>
+  </head>
+  <body>
+    <H1>Strafford</H1>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    <script>
+      //initialize the map         
+      var map = L.map('map').setView([43.86666045, -72.37770653], 13);
+      
+      //Create baselayer - tiles         
+      var backgroundMap = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',{
+       attribution: '<a href="http://openstreetmap.org">OpenStreetMap</a>contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+       maxZoom: 19
+       }
+      );
+      
+      backgroundMap.addTo(map);
+      //Create markers
+      var marker = L.marker([43.86666045, -72.37770653]).addTo(map);
+      
+      var store = L.marker([43.83416227, -72.36046207]).addTo(map);
+      
+      var morrill = L.marker([43.8633931, -72.37509513]).addTo(map);
+      
+      var house = L.marker([43.83115705, -72.3804574]).addTo(map);
+      
+      //add pop-ups
+      var popup1 = "Town Meeting House";
+      marker.bindPopup(popup1);
+      
+      var popup2 = "Coburn's General Store";
+      store.bindPopup(popup2);
+      
+      var popup3 = "Justin Morrill Homestead";
+      morrill.bindPopup(popup3);
+      var popup4 = "Tiny House";
+      house.bindPopup(popup4);
+      
+      //add a circle
+      var circle = L.circle([43.86666045, -72.37770653], 500, {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.25
+      }).addTo(map);
+      
+      //add a polygon
+      var polygon = L.polygon([
+        [43.86666045, -72.37770653],
+        [43.8633931, -72.37509513],
+        [43.83416227, -72.36046207],
+        [43.83115705, -72.3804574]
+      ]).addTo(map);
+      
+      // Create a marker first
+      var geojsonMarkerOptions = {
+        radius: 8,
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+      };
+
+      //create a empty geojson layer
+      var geojson = L.geoJson(null,{
+        pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng, geojsonMarkerOptions);
+        }
+      }).addTo(map);
+      
+      // new Http Request
+      var xhttp = new XMLHttpRequest();
+
+      // set the request method and data file
+      xhttp.open('GET', encodeURI("All_BFRO_Reports_points.geojson"));
+
+      //specify what must be done with the geojson data to the layer when request is successful
+      xhttp.onload = function() {
+        if (xhttp.readyState === 4) {
+            // add the json data to the geojson layer we created before!
+            geojson.addData(JSON.parse(xhttp.responseText));
+          } else {
+            alert('Request failed.  Returned status of ' + xhttp.status);
+          }
+      };
+
+      // send the request
+      xhttp.send();
+    </script>
+  </body>
+</html>
